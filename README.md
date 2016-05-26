@@ -1,3 +1,11 @@
+Version 2
+
+Update to use the new Firebase
+
+https://www.udemy.com/new-firebase/
+
+Original course at:
+
 https://www.udemy.com/firebase/
 
 As applications get more and more complex, clients demand faster interaction. They want to receive a post, a notice, an event as soon as it happens. They want to know if a friend is online or offline in a chat application as soon as the other party changes their status. They want to know these things as soon as they happen, in other words, in Real-Time.
