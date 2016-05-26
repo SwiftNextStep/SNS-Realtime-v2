@@ -20,8 +20,8 @@ class JSQViewController: JSQMessagesViewController {
     
     var imageToSend: UIImage?
     
-    let firebase = Firebase(url: "https://sns-realtimeapp.firebaseio.com")
-    var userConnection = Firebase()
+    let firebase = FIRDatabase.database().reference()
+    var userConnection = FIRDatabaseReference()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -31,16 +31,16 @@ class JSQViewController: JSQMessagesViewController {
     }
     
     func setupCollectUsers(){
-        firebase.childByAppendingPath("users").observeSingleEventOfType(FEventType.Value) { (snapshot:FDataSnapshot!) -> Void in
+        firebase.child("users").observeSingleEventOfType(.Value) { (snapshot:FIRDataSnapshot!) -> Void in
             print("Single -> \(snapshot)")
         }
-        firebase.childByAppendingPath("users").observeSingleEventOfType(FEventType.ChildChanged) { (snapshot:FDataSnapshot!) -> Void in
+        firebase.child("users").observeSingleEventOfType(.ChildChanged) { (snapshot:FIRDataSnapshot!) -> Void in
             print("Observer -> \(snapshot)")
         }
     }
     
     func setup(){
-        userConnection = Firebase(url: "https://sns-realtimeapp.firebaseio.com/users/\(senderId)/isOnline")
+        userConnection = FIRDatabase.database().reference().child("/users/\(senderId)/isOnline")
         userConnection.onDisconnectSetValue("false")
         //Old code we now are going to use the Accesory Button
         //self.inputToolbar?.contentView?.leftBarButtonItem?.hidden = true
@@ -52,7 +52,7 @@ class JSQViewController: JSQMessagesViewController {
         
         createAvatar(senderId, senderDisplayName: senderDisplayName, color: UIColor.lightGrayColor())
         
-        firebase.childByAppendingPath("JSQNode").queryLimitedToLast(50).queryOrderedByChild("date").observeSingleEventOfType(FEventType.Value) { (snapshot:FDataSnapshot!) -> Void in
+        firebase.child("JSQNode").queryLimitedToLast(50).queryOrderedByChild("date").observeSingleEventOfType(.Value) { (snapshot:FIRDataSnapshot!) -> Void in
             if let values = snapshot.value as? NSDictionary{
                 for value in values{
                     if !self.keys.contains(snapshot.key){
@@ -73,7 +73,7 @@ class JSQViewController: JSQMessagesViewController {
             }
         }
         
-        firebase.childByAppendingPath("JSQNode").queryLimitedToLast(1).observeEventType(.ChildAdded) { (snapshot:FDataSnapshot!) -> Void in
+        firebase.child("JSQNode").queryLimitedToLast(1).observeEventType(.ChildAdded) { (snapshot:FIRDataSnapshot!) -> Void in
             if !self.keys.contains(snapshot.key){
                 self.keys.append(snapshot.key)
                 if let message = snapshot.value as? NSDictionary{
@@ -106,7 +106,7 @@ class JSQViewController: JSQMessagesViewController {
     
     override func didPressSendButton(button: UIButton!, withMessageText text: String!, senderId: String!, senderDisplayName: String!, date: NSDate!) {
         //let message = JSQMessage(senderId: senderId, displayName: senderDisplayName, text: text)
-        firebase.childByAppendingPath("JSQNode").childByAutoId().setValue(["message":text, "senderId":senderId, "senderDisplayName":senderDisplayName, "date":date.timeIntervalSince1970, "messageType":"txt"])
+        firebase.child("JSQNode").childByAutoId().setValue(["message":text, "senderId":senderId, "senderDisplayName":senderDisplayName, "date":date.timeIntervalSince1970, "messageType":"txt"])
         //messages.append(message)
         JSQSystemSoundPlayer.jsq_playMessageSentSound()
         finishSendingMessage()

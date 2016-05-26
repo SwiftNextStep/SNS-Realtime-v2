@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>AD_UNIT_ID_FOR_BANNER_TEST</key>
+	<string>ca-app-pub-3940256099942544/2934735716</string>
+	<key>AD_UNIT_ID_FOR_INTERSTITIAL_TEST</key>
+	<string>ca-app-pub-3940256099942544/4411468910</string>
+	<key>CLIENT_ID</key>
+	<string>331798260211-vlts5kq0v55u4f4np5h629m4k9isjt57.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.331798260211-vlts5kq0v55u4f4np5h629m4k9isjt57</string>
+	<key>API_KEY</key>
+	<string>AIzaSyDOgjW8SFVahjw7fiufHCxfKRjflAvARzk</string>
+	<key>GCM_SENDER_ID</key>
+	<string>331798260211</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.swiftnextstep.SNS-Realtime</string>
+	<key>PROJECT_ID</key>
+	<string>sns-realtimeapp</string>
+	<key>STORAGE_BUCKET</key>
+	<string>sns-realtimeapp.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<true/>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false/>
+	<key>IS_APPINVITE_ENABLED</key>
+	<false/>
+	<key>IS_GCM_ENABLED</key>
+	<true/>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true/>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:331798260211:ios:f01b991d4e06bc33</string>
+	<key>DATABASE_URL</key>
+	<string>https://sns-realtimeapp.firebaseio.com</string>
+</dict>
+</plist>

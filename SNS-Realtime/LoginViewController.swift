@@ -10,7 +10,7 @@ import UIKit
 
 class LoginViewController: UIViewController {
 
-    var firebase = Firebase(url: "https://sns-realtimeapp.firebaseio.com")
+    var firebase = FIRDatabase.database().reference()
     var username = String()
     var newUser = false
     @IBOutlet weak var emailTextfield: UITextField!
@@ -23,10 +23,11 @@ class LoginViewController: UIViewController {
     
     @IBAction func Signup(sender: UIButton) {
         if checkFields(){
-            firebase.createUser(emailTextfield.text, password: passwordTextfield.text) { (error:NSError!) -> Void in
+            FIRAuth.auth()?.createUserWithEmail(emailTextfield.text!, password: passwordTextfield.text!)
+            { (user:FIRUser?, error:NSError?) in
                 if (error != nil){
-                    print(error.localizedDescription)
-                    self.displayMessage(error)
+                    print(error!.localizedDescription)
+                    self.displayMessage(error!)
                 } else{
                     print("New user created")
                     self.requestUsername()
@@ -42,7 +43,7 @@ class LoginViewController: UIViewController {
     }
     override func viewDidAppear(animated: Bool) {
         super.viewDidAppear(animated)
-        if firebase.authData != nil{
+        if FIRAuth.auth()?.currentUser != nil{
             self.retriveUserName()
         }
     }
@@ -56,18 +57,18 @@ class LoginViewController: UIViewController {
     func logUser(){
         if checkFields(){
             print("Start loggin user")
-            firebase.authUser(emailTextfield.text, password: passwordTextfield.text) { (error:NSError!, authData:FAuthData!) -> Void in
+            FIRAuth.auth()?.signInWithEmail(emailTextfield.text!, password: passwordTextfield.text!){ (user:FIRUser?, error:NSError?) in
                 if (error != nil){
-                    print(error.localizedDescription)
-                    self.displayMessage(error)
+                    print(error!.localizedDescription)
+                    self.displayMessage(error!)
                 } else{
-                    print("user logged \(authData.description)")
-                    let uid = authData.uid
+                    print("user logged \(user?.description)")
+                    let uid = user!.uid
                     if self.newUser{
-                        self.firebase.childByAppendingPath("users").childByAppendingPath(uid).setValue(["isOnline":true, "name":self.username])
+                        self.firebase.child("users").child(uid).setValue(["isOnline":true, "name":self.username])
                         self.performSegueWithIdentifier("segueJSQ", sender: self)
                     } else{
-                        self.firebase.childByAppendingPath("users").childByAppendingPath(uid).updateChildValues(["isOnline":true])
+                        self.firebase.child("users").child(uid).updateChildValues(["isOnline":true])
                         self.retriveUserName()
                     }
                 }
@@ -77,19 +78,24 @@ class LoginViewController: UIViewController {
     
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         if segue.identifier == "segueJSQ"{
-            let uid = self.firebase.authData.uid
-            if let viewController = segue.destinationViewController as? JSQViewController{
-                firebase.childByAppendingPath("users").childByAppendingPath(uid).updateChildValues(["isOnline":true])
-                viewController.senderId = uid
-                viewController.senderDisplayName = self.username
+            if let user = FIRAuth.auth()?.currentUser{
+                let uid = user.uid
+                if let viewController = segue.destinationViewController as? JSQViewController{
+                    firebase.child("users").child(uid).updateChildValues(["isOnline":true])
+                    viewController.senderId = uid
+                    viewController.senderDisplayName = self.username
+                }
             }
         }
     }
     
     func retriveUserName(){
-        self.firebase.childByAppendingPath("users").childByAppendingPath(firebase.authData.uid).observeSingleEventOfType(.Value) { (snapshot: FDataSnapshot!) -> Void in
-            self.username = (snapshot.value as! NSDictionary)["name"] as! String
-            self.performSegueWithIdentifier("segueJSQ", sender: self)
+        if let user = FIRAuth.auth()?.currentUser{
+            let uid = user.uid
+            self.firebase.child("users").child(uid).observeSingleEventOfType(.Value) { (snapshot: FIRDataSnapshot!) -> Void in
+                self.username = (snapshot.value as! NSDictionary)["name"] as! String
+                self.performSegueWithIdentifier("segueJSQ", sender: self)
+            }
         }
     }
     

@@ -7,12 +7,16 @@
 //
 
 import UIKit
+import Firebase
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
-    var firebase = Firebase(url: "https://sns-realtimeapp.firebaseio.com")
+    
+    override init() {
+        FIRApp.configure()
+    }
 
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
         // Override point for customization after application launch.
@@ -25,8 +29,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     func applicationDidEnterBackground(application: UIApplication) {
-        if let uid = self.firebase.authData?.uid{
-            firebase.childByAppendingPath("users").childByAppendingPath(uid).updateChildValues(["isOnline":false])
+        if let uid = FIRAuth.auth()?.currentUser?.uid{
+            FIRDatabase.database().reference().child("users").child(uid).updateChildValues(["isOnline":false])
         }
     }
 
@@ -35,8 +39,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     func applicationDidBecomeActive(application: UIApplication) {
-        if let uid = self.firebase.authData?.uid{
-            firebase.childByAppendingPath("users").childByAppendingPath(uid).updateChildValues(["isOnline":true])
+        if let uid =  FIRAuth.auth()?.currentUser?.uid{
+            FIRDatabase.database().reference().child("users").child(uid).updateChildValues(["isOnline":true])
         }
     }
 

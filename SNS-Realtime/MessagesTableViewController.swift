@@ -15,14 +15,14 @@ struct User {
 
 class MessagesTableViewController: UITableViewController {
     
-    var firebase = Firebase(url: "https://sns-realtimeapp.firebaseio.com/")
-    var chieldAddedHandler = FirebaseHandle()
+    var firebase = FIRDatabase.database().reference()
+    var chieldAddedHandler = FIRDatabaseHandle()
     var listOfMessages = NSMutableDictionary()
     
     let uid = String?()
 
     @IBAction func logout(sender: AnyObject) {
-        firebase.unauth()
+        try! FIRAuth.auth()?.signOut()
         self.dismissViewControllerAnimated(true, completion: nil)
     }
     @IBAction func addMesssage(sender: AnyObject) {
@@ -30,15 +30,15 @@ class MessagesTableViewController: UITableViewController {
     }
     override func viewDidLoad() {
         super.viewDidLoad()
-        chieldAddedHandler = firebase.childByAppendingPath("posts").observeEventType(.Value, withBlock: { (snapshot:FDataSnapshot!) -> Void in
+        chieldAddedHandler = firebase.child("posts").observeEventType(.Value, withBlock: { (snapshot:FIRDataSnapshot!) -> Void in
             self.firebaseUpdate(snapshot)
         })
-        chieldAddedHandler = firebase.observeEventType(.ChildChanged, withBlock: { (snapshot:FDataSnapshot!) -> Void in
+        chieldAddedHandler = firebase.observeEventType(.ChildChanged, withBlock: { (snapshot:FIRDataSnapshot!) -> Void in
             self.firebaseUpdate(snapshot)
         })
     }
 
-    func firebaseUpdate(snapshot: FDataSnapshot){
+    func firebaseUpdate(snapshot: FIRDataSnapshot){
         if let newMessages = snapshot.value as? NSDictionary{
             print(newMessages)
             for newMessage in newMessages{
@@ -143,7 +143,7 @@ class MessagesTableViewController: UITableViewController {
     */
     
     func receiveMessageToSend(message:String){
-        self.firebase.childByAppendingPath("posts").childByAutoId().setValue(["message":message, "sender":firebase.authData.uid])
+        self.firebase.child("posts").childByAutoId().setValue(["message":message, "sender":FIRAuth.auth()?.currentUser?.uid] as? AnyObject)
     }
 
 }
